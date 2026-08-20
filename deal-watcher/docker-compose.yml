@@ -1,0 +1,12 @@
+services:
+  deal-watcher:
+    build: .
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      TZ: Europe/Bucharest
+    volumes:
+      - ./data:/app/data
+      - ./recordings:/app/recordings
+      - ./config.json:/app/config.json

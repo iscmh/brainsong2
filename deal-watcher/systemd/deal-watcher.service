@@ -1,0 +1,19 @@
+# sudo cp systemd/deal-watcher.service /etc/systemd/system/
+# sudo systemctl enable --now deal-watcher
+[Unit]
+Description=Bulgaria deal watcher (Telegram)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/deal-watcher
+EnvironmentFile=/opt/deal-watcher/.env
+ExecStart=/usr/bin/node src/index.js watch
+Restart=always
+RestartSec=30
+StandardOutput=append:/var/log/deal-watcher.log
+StandardError=append:/var/log/deal-watcher.log
+
+[Install]
+WantedBy=multi-user.target

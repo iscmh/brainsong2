@@ -1,0 +1,59 @@
+# Free hosting option: GitHub Actions runs a sweep on a schedule and keeps state in a branch.
+# Set repository secrets TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID first.
+# Note: cron on Actions is best-effort - runs can be delayed by 5-20 minutes on a busy queue.
+name: deal-watcher
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: deal-watcher
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deal-watcher
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: deal-watcher/package-lock.json
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Restore saved prices
+        uses: actions/cache@v4
+        with:
+          path: deal-watcher/data
+          key: deal-watcher-state-${{ github.run_id }}
+          restore-keys: deal-watcher-state-
+
+      - name: Restore the recorded booking request (optional secret)
+        env:
+          HVD_RECORDING: ${{ secrets.HVD_RECORDING }}
+        run: |
+          if [ -n "$HVD_RECORDING" ]; then
+            mkdir -p recordings
+            printf '%s' "$HVD_RECORDING" > recordings/hvd-official.json
+            echo "recording restored"
+          else
+            echo "no HVD_RECORDING secret set - only sources with a urlTemplate will run"
+          fi
+
+      - name: Sweep
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node src/index.js once

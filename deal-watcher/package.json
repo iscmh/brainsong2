@@ -1,0 +1,18 @@
+{
+  "name": "deal-watcher",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Telegram price watcher for HVD Reina del Mar (Obzor, BG) and other sources",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "watch": "node src/index.js watch",
+    "once": "node src/index.js once",
+    "record": "node src/index.js record",
+    "ping": "node src/index.js ping",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

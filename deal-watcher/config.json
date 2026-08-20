@@ -1,0 +1,152 @@
+{
+  "$comment": "Copiaza in config.json si editeaza. Aproape tot se poate schimba si din Telegram (/help). Placeholderi disponibili in urlTemplate: {checkIn} {checkOut} {checkInDMY} {checkOutDMY} {nights} {adults} {childCount} {childAges} {rooms} {currency}",
+  "search": {
+    "checkInFrom": "2027-07-20",
+    "checkInTo": "2027-08-08",
+    "nights": 6,
+    "preferredFrom": "2027-07-25",
+    "preferredTo": "2027-08-03",
+    "occupancies": [
+      {
+        "id": "3A+1C12",
+        "label": "3 adulti + 1 copil 12 ani",
+        "enabled": true,
+        "rooms": [
+          {
+            "adults": 3,
+            "childAges": [
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "id": "4A",
+        "label": "4 adulti (comparatie - unele hoteluri taxeaza copilul de 12 ani ca adult)",
+        "enabled": true,
+        "rooms": [
+          {
+            "adults": 4,
+            "childAges": []
+          }
+        ]
+      },
+      {
+        "id": "2R",
+        "label": "2 camere (2 adulti + 1 adult & 1 copil 12)",
+        "enabled": false,
+        "rooms": [
+          {
+            "adults": 2,
+            "childAges": []
+          },
+          {
+            "adults": 1,
+            "childAges": [
+              12
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sources": {
+    "mock": {
+      "enabled": false,
+      "label": "Hotel fictiv (pentru test, fara internet)",
+      "adapter": "mock",
+      "basePrice": 1450,
+      "currency": "EUR",
+      "requestDelayMs": 0
+    },
+    "hvd-official": {
+      "enabled": true,
+      "label": "HVD Reina del Mar — site oficial",
+      "adapter": "replay",
+      "hotelUrl": "https://hvdhotels.com/hotels/hvd-reina-del-mar/",
+      "recording": "recordings/hvd-official.json",
+      "candidateIndex": 0,
+      "currency": "EUR",
+      "priceIs": "total",
+      "titleExclude": "single room|room for single use",
+      "note": "Ruleaza `npm run record -- hvd-official` o data ca sa capturezi request-ul motorului de rezervari."
+    },
+    "booking": {
+      "enabled": false,
+      "label": "Booking.com",
+      "adapter": "generic",
+      "hotelUrl": "https://www.booking.com/hotel/bg/hvd-reinda-del-mar.html",
+      "urlTemplate": "https://www.booking.com/hotel/bg/hvd-reinda-del-mar.html?checkin={checkIn}&checkout={checkOut}&group_adults={adults}&group_children={childCount}&age={childAges}&no_rooms={rooms}&selected_currency={currency}&lang=en-gb",
+      "waitForSelector": "#hprt-table",
+      "offerSelector": "#hprt-table tbody tr",
+      "fields": {
+        "title": ".hprt-roomtype-icon-link",
+        "price": ".prco-valign-middle-helper",
+        "board": ".hprt-table-cell-breakfast"
+      },
+      "currency": "EUR",
+      "priceIs": "total",
+      "note": "Selectorii Booking.com se schimba des si scraping-ul incalca ToS-ul lor. Dezactivat by default — vezi README."
+    },
+    "directbooking": {
+      "enabled": false,
+      "label": "DirectBooking.ro",
+      "adapter": "replay",
+      "hotelUrl": "https://bulgaria.directbooking.ro/booking-hvd-reina-del-mar-obzor-reservation-offer-2135146.aspx",
+      "recording": "recordings/directbooking.json",
+      "currency": "EUR",
+      "priceIs": "total"
+    },
+    "custom": {
+      "enabled": false,
+      "label": "Orice alt site (scraping pe selectori)",
+      "adapter": "generic",
+      "urlTemplate": "https://example.com/search?checkin={checkIn}&checkout={checkOut}&adults={adults}&children={childCount}&ages={childAges}",
+      "waitForSelector": ".room-list",
+      "offerSelector": ".room-card",
+      "fields": {
+        "title": ".room-title",
+        "price": ".room-price",
+        "board": ".room-board",
+        "cancellation": ".room-cancel"
+      },
+      "currency": "EUR",
+      "priceIs": "total"
+    }
+  },
+  "alerts": {
+    "absoluteThresholdEur": null,
+    "perPersonPerNightThresholdEur": null,
+    "minDropPctVsBest": 1,
+    "minDropPctVsLast": 5,
+    "alertOnNewAvailability": true,
+    "cooldownHours": 6,
+    "dailyDigestHourLocal": 9,
+    "maxOffersPerAlert": 3
+  },
+  "schedule": {
+    "fullSweepMinutes": 30,
+    "hotSweepMinutes": 10,
+    "jitterSeconds": 45,
+    "requestDelayMs": 2500,
+    "maxParallelSources": 1,
+    "retries": 2
+  },
+  "currency": {
+    "base": "EUR",
+    "rates": {
+      "EUR": 1,
+      "BGN": 1.95583,
+      "RON": 4.98,
+      "USD": 1.08,
+      "GBP": 0.85
+    }
+  },
+  "runtime": {
+    "headless": true,
+    "timezone": "Europe/Bucharest",
+    "locale": "ro-RO",
+    "navigationTimeoutMs": 45000,
+    "stateFile": "data/state.json"
+  }
+}
